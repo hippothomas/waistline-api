@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Uid\Uuid;
 
 class AccountController extends AbstractController
 {
@@ -49,6 +50,7 @@ class AccountController extends AbstractController
 						$user->getPassword()
 					)
 				);
+				$user->setApiKey(Uuid::v7());
 
 				$entityManager->persist($user);
 				$entityManager->flush();

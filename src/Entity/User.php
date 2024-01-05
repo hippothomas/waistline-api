@@ -3,12 +3,18 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
@@ -44,6 +50,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         message: 'Passwords are not the same...',
     )]
     private ?string $passwordConfirm = null;
+
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    private ?Uuid $apiKey = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $created = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $updated = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $lastLogin = null;
 
     public function getId(): ?int
     {
@@ -125,5 +143,69 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         $this->passwordConfirm = null;
+    }
+
+	public function getApiKey(): ?Uuid
+	{
+        return $this->apiKey;
+	}
+
+	public function setApiKey(Uuid $apiKey): self
+	{
+        $this->apiKey = $apiKey;
+
+		return $this;
+	}
+
+    public function getCreated(): ?DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    public function getLastLogin(): ?DateTimeInterface
+    {
+        return $this->lastLogin;
+    }
+
+    public function setLastLogin(DateTimeInterface $lastLogin): self
+    {
+        $this->lastLogin = $lastLogin;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updatedTimestamps(): void
+    {
+        $dateTimeNow = new DateTime('now');
+
+        $this->setUpdated($dateTimeNow);
+
+        if ($this->getCreated() === null) {
+            $this->setCreated($dateTimeNow);
+        }
+        if ($this->getLastLogin() === null) {
+            $this->setLastLogin($dateTimeNow);
+        }
     }
 }

@@ -33,8 +33,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/dashboard, roles: ROLE_USER }
+        - { route: account_login|account_register, allow_if: "!is_granted('ROLE_USER')" }
+        - { route: dashboard, allow_if: "is_granted('ROLE_USER')" }
 
 when@test:
     security:

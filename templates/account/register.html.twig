@@ -3,21 +3,38 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-3">&nbsp;</div>
-        <div class="col-md-6">
-            <div class="bg-light py-3 px-3">
-                <h1>Register</h1>
+<div class="container">
+	<h1>Register</h1>
 
-                {{ form_start(form) }}
-                {{ form_widget(form) }}
+	{{ form_start(form) }}
+		<div class="input-box">
+			{{ form_label(form.username) }}
+			{{ form_widget(form.username) }}
+			<div class="errors">{{ form_errors(form.username) }}</div>
+		</div>
+		<div class="input-box">
+			{{ form_label(form.password) }}
+			{{ form_widget(form.password) }}
+			<div class="errors">{{ form_errors(form.password) }}</div>
+		</div>
+		<div class="input-box">
+			{{ form_label(form.passwordConfirm) }}
+			{{ form_widget(form.passwordConfirm) }}
+			<div class="errors">{{ form_errors(form.passwordConfirm) }}</div>
+		</div>
+		<div class="policy">
+			{{ form_widget(form.agreeTerms) }}
+			{{ form_label(form.agreeTerms) }}
+			<div class="errors">{{ form_errors(form.agreeTerms) }}</div>
+		</div>
 
-                <button type="submit" class="btn btn-success">Register</button>
+		<div class="input-box button">
+			<button type="submit">Register</button>
+		</div>
+	{{ form_end(form) }}
 
-                {{ form_end(form) }}
-            </div>
-        </div>
-    </div>
+	<div class="existing-account">
+		Already have an account? <a href="{{ path('account_login') }}">Sign in</a>
+	</div>
 </div>
 {% endblock %}

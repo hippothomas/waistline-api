@@ -27,3 +27,7 @@ services:
     App\EventListener\LoginListener:
         tags:
             - { name: 'kernel.event_listener', event: 'security.interactive_login' }
+
+    App\EventSubscriber\ApiSubscriber:
+        arguments:
+            $apiDailyLimit: '%api.daily_limit%'

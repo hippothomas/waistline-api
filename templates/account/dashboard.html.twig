@@ -3,8 +3,35 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<div class="container">
+<div class="container dashboard">
 	<h1>Dashboard</h1>
-	<p>Hello {{ username }}!</p>
+	<div class="content">
+		<p>Welcome <strong>{{ username }}</strong>!</p>
+		<p>Today's API Usage: {{ (api_usage*100)/api_daily_limit|round }}% ({{ api_usage }} / {{ api_daily_limit }})</p>
+	</div>
+	<form>
+		<div class="input-box">
+			<label for="service-address">Service Address</label>
+			<div class="infobox">
+				<input type="text" id="service-address" value="{{ url('api_sync') }}" disabled />
+				<span class="copylink" tooltip="Copy to clipboard">
+					<i class="fa-regular fa-copy"></i>
+				</span>
+			</div>
+		</div>
+		<div class="input-box">
+			<label for="authorization-header">Service Authorization Header</label>
+			<div class="infobox">
+				<input type="text" id="authorization-header" value="Basic {{ api_key }}" disabled />
+				<span class="copylink" tooltip="Copy to clipboard">
+					<i class="fa-regular fa-copy"></i>
+				</span>
+			</div>
+		</div>
+	</form>
+	<div class="footer">
+		<a href="#" target="_blank">Documentation</a>
+		<a href="{{ path('account_logout') }}">Logout</a>
+	</div>
 </div>
 {% endblock %}

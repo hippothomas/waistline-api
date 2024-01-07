@@ -6,6 +6,8 @@
 parameters:
     app.register: '%env(APP_REGISTER)%'
     api.daily_limit: '%env(API_DAILY_LIMIT)%'
+    mongodb.url: '%env(MONGODB_URL)%'
+    mongodb.name: '%env(MONGODB_NAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -31,3 +33,8 @@ services:
     App\EventSubscriber\ApiSubscriber:
         arguments:
             $apiDailyLimit: '%api.daily_limit%'
+
+    App\Service\MongoDB:
+        arguments:
+            $mongoDbUrl: '%mongodb.url%'
+            $mongoDbName: '%mongodb.name%'

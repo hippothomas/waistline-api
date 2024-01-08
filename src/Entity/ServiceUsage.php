@@ -21,10 +21,10 @@ class ServiceUsage
     #[ORM\JoinColumn(nullable: false)]
     private ?User $account = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'daily_usage')]
     private ?int $usage = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_usage', type: Types::DATE_MUTABLE)]
     private ?DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

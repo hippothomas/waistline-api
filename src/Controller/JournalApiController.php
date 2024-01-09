@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Service\MongoDB;
-use DateTime;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,8 +13,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class JournalApiController extends ApiController
 {
     public function __construct(
-		private readonly MongoDB $mongoDB
-	) { }
+		private readonly MongoDB $mongoDB,
+		private readonly LoggerInterface $logger
+	) {
+		parent::__construct($logger);
+	}
 
 	#[Route('/api/v1/journal', name: 'api_journal', methods: ['GET'])]
     public function index(Request $request): JsonResponse
@@ -22,12 +25,7 @@ class JournalApiController extends ApiController
 		$user = $this->getUser();
 
 		// Set $date to current date or to the request parameter date
-		$dateParam = $request->get('date');
-		if (empty($dateParam)) {
-			$date = new DateTime();
-		} else {
-			$date = DateTime::createFromFormat('Y-m-d', $dateParam);
-		}
+		$date = $this->formatDateParameter((string) $request->get('date'));
 
 		// Get data from MongoDB
 		$result = $this->mongoDB->findOne($user->getId(), $date);

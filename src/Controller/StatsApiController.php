@@ -76,8 +76,11 @@ class StatsApiController extends ApiController
 		// Handle partial response with parameter 'fields'
 		$fields_parameter = (string) $request->get('fields');
 
-		// TODO: Add sorting
-		$sort = 'ASC';
+		// Handle sorting (DESC by Default)
+		$sort = match ((string) $request->get('sort')) {
+			'ASC' => 1,
+    		default => -1
+		};
 
 		// TODO: Add pagination
 		$limit = 100;
@@ -85,7 +88,8 @@ class StatsApiController extends ApiController
 		$cursor = $this->mongoDB->retrieveUserNutritionData(
 			$user->getId(),
 			$date_list,
-			$this->getFields($fields_parameter)
+			$this->getFields($fields_parameter),
+			$sort
 		);
 		if ($cursor === false) {
 			throw new HttpException(500, 'An error occurred while processing your request. Please try again later.');

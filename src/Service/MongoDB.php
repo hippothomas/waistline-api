@@ -100,12 +100,13 @@ readonly class MongoDB
 
 	/**
 	 * Retrieve nutrition data based on request parameters
-	 * @param int   $user_id      User ID to search for
-	 * @param array $date_list    List of dates
-	 * @param array $fields_group  List of fields to filter the mongo request
+	 * @param int   $user_id      	User ID to search for
+	 * @param array $date_list    	List of dates
+	 * @param array $fields_group  	List of fields to filter the mongo request
+	 * @param int 	$sort			Specify a sorting order
 	 * @return CursorInterface|false Returns the retrieved nutrition data, false otherwise
 	 */
-	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group): CursorInterface|false
+	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group, int $sort = -1): CursorInterface|false
 	{
 		$collection = $this->getCollection();
 		if (!$collection) return false;
@@ -146,7 +147,7 @@ readonly class MongoDB
 					]
 				],
 				[
-					'$sort' => [ '_id' => -1 ]
+					'$sort' => [ '_id' => $sort ]
 				]
 			]);
 		} catch (Exception $e) {

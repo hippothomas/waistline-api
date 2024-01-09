@@ -7,6 +7,7 @@ use Exception;
 use MongoDB\BSON\Regex;
 use MongoDB\Collection;
 use MongoDB\Client as Mongo;
+use MongoDB\Driver\CursorInterface;
 use Psr\Log\LoggerInterface;
 
 readonly class MongoDB
@@ -89,6 +90,65 @@ readonly class MongoDB
 				'limit' => 1
 			]);
 			return (array) $result;
+		} catch (Exception $e) {
+			$this->logger->error('[MongoDB] Exception: {exception}', [
+				'exception' => $e->getMessage(),
+			]);
+		}
+		return false;
+	}
+
+	/**
+	 * Retrieve nutrition data based on request parameters
+	 * @param int   $user_id      User ID to search for
+	 * @param array $date_list    List of dates
+	 * @param array $fields_group  List of fields to filter the mongo request
+	 * @return CursorInterface|false Returns the retrieved nutrition data, false otherwise
+	 */
+	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group): CursorInterface|false
+	{
+		$collection = $this->getCollection();
+		if (!$collection) return false;
+
+		// Prepare the date list for the request
+		if (empty($date_list)) return false;
+		$dates = [];
+		foreach ($date_list as $date) {
+			$dates[] = [ 'entry.dateTime' => new Regex("{$date}.*") ];
+		}
+
+		// Prepare the fields for the request
+		$fields = [];
+		if (!empty($fields_group)) {
+			foreach ($fields_group as $nutrition) {
+				$fields[$nutrition] = '$$ROOT.nutrition.'.$nutrition;
+			}
+		}
+
+		// Search into the collection and return results as an array, if successfully found
+		try {
+			return $collection->aggregate([
+				[
+					'$match' => [
+						'user_id' => $user_id,
+						'$or' => $dates
+					]
+				],
+				[
+					'$sort' => [ 'timestamp' => -1 ]
+				],
+				[
+					'$group' => [
+						'_id' => '$entry.dateTime',
+						'data' => [
+							'$first' => !empty($fields) ? $fields : '$$ROOT.nutrition'
+						]
+					]
+				],
+				[
+					'$sort' => [ '_id' => -1 ]
+				]
+			]);
 		} catch (Exception $e) {
 			$this->logger->error('[MongoDB] Exception: {exception}', [
 				'exception' => $e->getMessage(),

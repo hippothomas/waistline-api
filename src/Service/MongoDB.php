@@ -104,9 +104,11 @@ readonly class MongoDB
 	 * @param array $date_list    	List of dates
 	 * @param array $fields_group  	List of fields to filter the mongo request
 	 * @param int 	$sort			Specify a sorting order
+	 * @param int 	$limit			Specify a pagination limit
+	 * @param int 	$offset			Specify a pagination offset value
 	 * @return CursorInterface|false Returns the retrieved nutrition data, false otherwise
 	 */
-	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group, int $sort = -1): CursorInterface|false
+	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group, int $sort = -1, int $limit = 100, int $offset = 0): CursorInterface|false
 	{
 		$collection = $this->getCollection();
 		if (!$collection) return false;
@@ -148,6 +150,17 @@ readonly class MongoDB
 				],
 				[
 					'$sort' => [ '_id' => $sort ]
+				],
+				[
+					'$facet' => [
+					  	'paginatedResults' => [
+							[ '$skip' => $offset ],
+							[ '$limit' => $limit ]
+					  	],
+					  	'totalCount' => [
+							['$count' => 'count']
+					  	]
+					]
 				]
 			]);
 		} catch (Exception $e) {

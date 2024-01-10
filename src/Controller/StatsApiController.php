@@ -82,32 +82,54 @@ class StatsApiController extends ApiController
     		default => -1
 		};
 
-		// TODO: Add pagination
-		$limit = 100;
+		// Handle pagination
+		$limit = (int) $request->get('limit', 100);
+		// Maximum allowed limit value is 500
+		if ($limit > 500) {
+			throw new HttpException(400, 'Invalid limit value. The maximum allowed limit is 500.');
+		}
+		$offset = (int) $request->get('offset', 0);
+		// Verify if both limit and offset have valid values
+		if ($limit <= 0 || $offset < 0) {
+			throw new HttpException(400, 'Invalid limit or offset value. Limit must be greater than 0, and offset must be non-negative.');
+		}
 
 		$cursor = $this->mongoDB->retrieveUserNutritionData(
 			$user->getId(),
 			$date_list,
 			$this->getFields($fields_parameter),
-			$sort
+			$sort,
+			$limit,
+			$offset
 		);
 		if ($cursor === false) {
 			throw new HttpException(500, 'An error occurred while processing your request. Please try again later.');
 		}
 
+		// Retrieve the current user nutrition data from the cursor
+		$cursor->next();
+		$user_nutrition_data = $cursor->current();
+		if ($user_nutrition_data === false) {
+			throw new HttpException(500, 'An error occurred while processing your request. Please try again later.');
+		}
+
+		// Format the request result
 		$results = [];
-		foreach ($cursor as $r) {
+		foreach ($user_nutrition_data["paginatedResults"] as $r) {
 			$date = DateTime::createFromFormat(DateTimeInterface::RFC3339_EXTENDED, $r["_id"]);
-			if ($date === false) {
-				$this->logger->warning('[StatsApiController][DateTime] Date: {date} is not compatible with format DateTimeInterface::RFC3339_EXTENDED.', [
-					'date' => (string) $r["_id"]
-				]);
-				throw new HttpException(500, 'An error occurred while processing your request. Please contact support.');
-			}
+			if ($date === false) continue; // Date is not compatible with format DateTimeInterface::RFC3339_EXTENDED
 			$results[$date->format('Y-m-d')] = (array) $r["data"];
 		}
 
-        return new JsonResponse($this->formatResults($results), Response::HTTP_OK);
+		// Format pagination
+		$total_count = $user_nutrition_data["totalCount"][0]["count"];
+		$pagination = [
+			"limit" => $limit,
+			"offset" => $offset,
+			"total" => $total_count
+		];
+
+        return new JsonResponse($this->formatResults($results, $pagination), Response::HTTP_OK);
     }
 
 	/**

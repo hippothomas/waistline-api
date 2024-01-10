@@ -36,6 +36,6 @@ class JournalApiController extends ApiController
 		// Remove user & timestamp in data
 		unset($result['_id']);
 
-        return new JsonResponse($this->formatResults($result, true), Response::HTTP_OK);
+        return new JsonResponse($this->formatResults($result, [], true), Response::HTTP_OK);
     }
 }

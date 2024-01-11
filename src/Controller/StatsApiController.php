@@ -49,10 +49,10 @@ class StatsApiController extends ApiController
 		$user = $this->getUser();
 
 		// Handle filters with parameters 'date_from' / 'date_to' / 'interval'
-		// Set $date_from to current date or to the request parameter date
-		$date_from = $this->formatDateParameter((string) $request->get('date_from'));
-		// Set $date_to to current date + 1 week or to the request parameter date
-		$date_to = $this->formatDateParameter((string) $request->get('date_to'), '+1 week');
+		// Set $date_from to current date -6 day or to the request parameter date
+		$date_from = $this->formatDateParameter((string) $request->get('date_from'), '-6 day');
+		// Set $date_to to current date +1 day or to the request parameter date
+		$date_to = $this->formatDateParameter((string) $request->get('date_to'), '+1 day');
 		// Check if the interval parameter is contained in possibility list or set a day interval
 		$date_interval = $this->getDateInterval((string) $request->get('interval'));
 
@@ -122,7 +122,7 @@ class StatsApiController extends ApiController
 		}
 
 		// Format pagination
-		$total_count = $user_nutrition_data["totalCount"][0]["count"];
+		$total_count = $user_nutrition_data["totalCount"][0]["count"] ?? 0;
 		$pagination = [
 			"limit" => $limit,
 			"offset" => $offset,

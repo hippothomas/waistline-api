@@ -33,6 +33,4 @@ jobs:
         platforms: linux/amd64,linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags:
-          ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:latest
-          ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:${{ secrets.VERSION }}
+        tags: ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:latest, ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:${{ secrets.VERSION }}

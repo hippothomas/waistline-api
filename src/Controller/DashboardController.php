@@ -16,12 +16,14 @@ class DashboardController extends AbstractController
 		$api_key = $this->getUser()->getApiKey();
 		$api_daily_limit = $this->getParameter('api.daily_limit');
 		$api_usage = $serviceUsageRepository->getDailyUsage($this->getUser())->getUsage();
+		$base_url = $this->getParameter('app.base_url');
 
         return $this->render('account/dashboard.html.twig', [
 			'username' => $username,
 			'api_key' => $api_key,
 			'api_daily_limit' => $api_daily_limit,
-			'api_usage' => $api_usage
+			'api_usage' => $api_usage,
+			'base_url' => $base_url
 		]);
     }
 }

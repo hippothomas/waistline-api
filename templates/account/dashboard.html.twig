@@ -13,7 +13,7 @@
 		<div class="input-box">
 			<label for="service-address">Service Address</label>
 			<div class="infobox">
-				<input type="text" id="service-address" value="{{ url('api_sync') }}" disabled />
+				<input type="text" id="service-address" value="{{ base_url }}{{ path('api_sync') }}" disabled />
 				<span class="copylink" tooltip="Copy to clipboard">
 					<i class="fa-regular fa-copy"></i>
 				</span>

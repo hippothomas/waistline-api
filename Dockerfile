@@ -8,13 +8,16 @@ WORKDIR /var/www/html
 # Copy the code into the container
 COPY . .
 
+## Set default php.ini
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+
 ## Copy custom configurations
 COPY ./deployment/apache.conf /etc/apache2/sites-available/000-default.conf
 COPY ./deployment/php.ini /usr/local/etc/php/conf.d/custom-php.ini
 
 # Install PHP extensions and other dependencies
 RUN apt-get update && \
-    apt-get install -y wget libpq-dev libicu-dev && \
+    apt-get install -y wget git libpq-dev libicu-dev && \
     docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
     docker-php-ext-install intl opcache pgsql pdo pdo_pgsql && \
     pecl install mongodb && \
@@ -27,8 +30,11 @@ RUN wget https://getcomposer.org/installer && \
     php installer --install-dir=/usr/local/bin/ --filename=composer && \
     rm installer
 
-## Install application dependencies
+## Setting env
 ENV APP_ENV=prod
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+## Install application dependencies
 RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 ## Change files owner to apache default user

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,7 +42,13 @@ class ApiController extends AbstractController
 	 */
 	protected function formatDateParameter(string $date, string $default = 'now'): DateTime
 	{
-		$datetime = DateTime::createFromFormat('Y-m-d', $date);
+		// Check date format
+		$format = DateTimeInterface::RFC3339_EXTENDED;
+		if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+			$format = 'Y-m-d';
+		}
+
+		$datetime = DateTime::createFromFormat($format, $date);
 		// If an invalid Date/Time string is passed in $default, DateMalformedStringException is thrown
 		try {
 			return $datetime !== false ? $datetime : new DateTime($default);

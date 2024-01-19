@@ -29,7 +29,7 @@ jobs:
         platforms: linux/amd64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: waistlineapi/waistline-api:latest, waistlineapi/waistline-api:${{ secrets.VERSION }}
+        tags: waistlineapi/waistline-api:${{ secrets.VERSION }}-amd64
 
   arm-build:
     name: Build & Deploy (ARM)
@@ -55,4 +55,19 @@ jobs:
         platforms: linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: waistlineapi/waistline-api:latest, waistlineapi/waistline-api:${{ secrets.VERSION }}
+        tags: waistlineapi/waistline-api:${{ secrets.VERSION }}-arm64
+
+  combine-manifest:
+    name: Combine the manifests
+    needs:
+      - amd-build
+      - arm-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Combine the manifests
+      uses: int128/docker-manifest-create-action@v2
+      with:
+        tags: waistlineapi/waistline-api:latest
+        sources: |
+          waistlineapi/waistline-api:${{ secrets.VERSION }}-amd64
+          waistlineapi/waistline-api:${{ secrets.VERSION }}-arm64

@@ -1,0 +1,35 @@
+version: '3'
+services:
+  waistline-api:
+    image: waistlineapi/waistline-api:latest
+    container_name: waistline-api
+    depends_on:
+      - postgres
+      - mongodb
+    volumes:
+      - .env.local:/var/www/html/.env.local
+      - ./data/log:/var/log/apache2/ #optional
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16.1
+    container_name: waistline-api_postgres
+    environment:
+      POSTGRES_DB: 'waistline'
+      POSTGRES_USER: 'app'
+      POSTGRES_PASSWORD: '!ChangeMe!'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7.0
+    container_name: waistline-api_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '!ChangeMe!'
+    volumes:
+      - ./data/mongodb:/data/db
+    restart: unless-stopped

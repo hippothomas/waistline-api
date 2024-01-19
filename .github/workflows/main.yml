@@ -18,7 +18,6 @@ jobs:
     - name: Login to container registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ secrets.CONTAINER_REGISTRY_URL }}
         username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ secrets.CONTAINER_REGISTRY_PWD }}
 
@@ -30,7 +29,7 @@ jobs:
         platforms: linux/amd64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:latest, ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:${{ secrets.VERSION }}
+        tags: waistlineapi/waistline-api:latest, waistlineapi/waistline-api:${{ secrets.VERSION }}
 
   arm-build:
     name: Build & Deploy (ARM)
@@ -45,7 +44,6 @@ jobs:
     - name: Login to container registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ secrets.CONTAINER_REGISTRY_URL }}
         username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ secrets.CONTAINER_REGISTRY_PWD }}
 
@@ -57,4 +55,4 @@ jobs:
         platforms: linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:latest, ${{ secrets.CONTAINER_REGISTRY_URL }}/waistline-api:${{ secrets.VERSION }}
+        tags: waistlineapi/waistline-api:latest, waistlineapi/waistline-api:${{ secrets.VERSION }}

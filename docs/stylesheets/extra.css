@@ -1,0 +1,25 @@
+label.http {
+	position: relative;
+}
+label.http:after {
+	background: #757575;
+	color: #fff;
+	font-size: 12px;
+	border-radius: 3px;
+	padding: 3px;
+	position: absolute;
+	top: 1px;
+	left: 5px;
+}
+label.http.get:after {
+	content: 'GET';
+	background: #2094f3;
+}
+label.http.post:after {
+	content: 'POST';
+	background: #ff6e42;
+}
+/* Change highlighting inline code only */
+code:not(:has(> span)) {
+  --md-code-fg-color: #ef5552;
+}

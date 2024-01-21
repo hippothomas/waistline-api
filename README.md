@@ -11,7 +11,7 @@ This endpoint allows me to visualize my stats in a Grafana dashboard.
 <img src="docs/img/grafana-dashboard.png" title="Grafana Dashboard" alt="Screenshot from my Grafana Dashboard" />
 
 ## Links
-- [Documentation]() — Learn how to use Waistline API (Will come soon...)
+- [Documentation](https://docs.waistline-api.hippolyte-thomas.fr) — Learn how to use Waistline API
 - [Docker Hub](https://hub.docker.com/r/waistlineapi/waistline-api) — Find all docker images
 
 ## Installation

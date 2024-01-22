@@ -178,3 +178,11 @@ i.fa-regular.fa-copy:before {
 	font-size: 20px;
 	color: #ff0a4b;
 }
+.version {
+	position: absolute;
+	bottom: 5px;
+	width: calc(100% - 68px);
+	text-align: center;
+	color: #aaa;
+	font-size: 14px;
+}

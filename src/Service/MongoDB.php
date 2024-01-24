@@ -40,6 +40,15 @@ readonly class MongoDB
     }
 
 	/**
+	 * Check if an actual connection to the database is established
+	 * @return bool
+	 */
+	public function isConnected(): bool
+	{
+		return $this->getCollection() !== false;
+	}
+
+	/**
 	 * Inserts a single document into the MongoDB collection
 	 * @param array $data The data to be inserted into the collection.
 	 * @return bool Returns true on successful insertion, false otherwise.

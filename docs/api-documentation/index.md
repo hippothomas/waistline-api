@@ -196,3 +196,29 @@ curl '<APP_BASE_URL>/api/v1/sync' \
 |-----------------|--------------------------------------------------------|
 | `status`        | HTTP status code                                       |
 | `message`       | Return `'Data synchronized.'` if the data was inserted |
+
+### Health Endpoint <label class="http get"></label>
+The `health` endpoint permit to monitor if there isn't any problem with the app.<br/>
+<ins>No authentication required</ins> for this endpoint.
+
+**Example API Request:**<br/>
+```bash
+curl '<APP_BASE_URL>/api/v1/health'
+```
+
+**Example API Response:**<br/>
+```json
+{
+	"healthy": true
+}
+```
+
+**API Response Objects:**<br/>
+
+| Response Object | Description                       |
+|-----------------|-----------------------------------|
+| `healthy`       | Return `true` if everything is ok |
+
+!!! info
+
+    If a non-200 HTTP status code is returned or if the returned healthy field is false the service should be considered as unhealthy.

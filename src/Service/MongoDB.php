@@ -115,12 +115,14 @@ readonly class MongoDB
 	 * @param int 	$sort			Specify a sorting order
 	 * @param int 	$limit			Specify a pagination limit
 	 * @param int 	$offset			Specify a pagination offset value
+	 * @param array $filters_group  List filter for the mongo request
 	 * @return CursorInterface|false Returns the retrieved nutrition data, false otherwise
 	 */
-	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group, int $sort = -1, int $limit = 100, int $offset = 0): CursorInterface|false
+	public function retrieveUserNutritionData(int $user_id, array $date_list, array $fields_group, int $sort = -1, int $limit = 100, int $offset = 0, array $filters_group = []): CursorInterface|false
 	{
 		$collection = $this->getCollection();
 		if (!$collection) return false;
+		$match = ['user_id' => $user_id];
 
 		// Prepare the date list for the request
 		if (empty($date_list)) return false;
@@ -128,6 +130,7 @@ readonly class MongoDB
 		foreach ($date_list as $date) {
 			$dates[] = [ 'entry.dateTime' => new Regex("{$date}.*") ];
 		}
+		$match['$or'] = $dates;
 
 		// Prepare the fields for the request
 		$fields = [];
@@ -137,14 +140,14 @@ readonly class MongoDB
 			}
 		}
 
+		// Add filters for the request
+		$match = array_merge($match, $filters_group);
+
 		// Search into the collection and return results as an array, if successfully found
 		try {
 			return $collection->aggregate([
 				[
-					'$match' => [
-						'user_id' => $user_id,
-						'$or' => $dates
-					]
+					'$match' => $match
 				],
 				[
 					'$sort' => [ 'timestamp' => -1 ]

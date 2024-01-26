@@ -44,7 +44,7 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
-        push: true
+        push: github.event_name != 'pull_request'
         tags: waistlineapi/waistline-api:${{ APP_VERSION }}-amd64
 
   arm-build:
@@ -74,11 +74,12 @@ jobs:
         file: ./Dockerfile
         platforms: linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
-        push: true
+        push: github.event_name != 'pull_request'
         tags: waistlineapi/waistline-api:${{ APP_VERSION }}-arm64
 
   combine-manifest:
     name: Combine the manifests
+    if: github.event_name != 'pull_request'
     needs:
       - amd-build
       - arm-build

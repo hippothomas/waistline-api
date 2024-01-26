@@ -52,11 +52,12 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
-        push: github.event_name != 'pull_request'
+        push: ${{ github.event_name != 'pull_request' }}
         tags: waistlineapi/waistline-api:$APP_VERSION-amd64
 
   arm-build:
     name: Build & Deploy (ARM)
+    if: github.event_name != 'pull_request'
     needs: set-environment
     runs-on: buildjet-4vcpu-ubuntu-2204-arm
     steps:
@@ -82,7 +83,7 @@ jobs:
         file: ./Dockerfile
         platforms: linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
-        push: github.event_name != 'pull_request'
+        push: ${{ github.event_name != 'pull_request' }}
         tags: waistlineapi/waistline-api:$APP_VERSION-arm64
 
   combine-manifest:

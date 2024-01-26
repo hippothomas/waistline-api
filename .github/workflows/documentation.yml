@@ -1,0 +1,30 @@
+name: Documentation
+on:
+  release:
+    types: [ published ]
+jobs:
+  docs-deployment:
+    name: 'Deploy documentation'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the latest code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: MkDocs build
+        run: |
+            pip install mkdocs
+            mkdocs build
+
+      - uses: jsmrcaga/action-netlify-deploy@v2.0.0
+        with:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_DEPLOY_TO_PROD: true
+          build_directory: 'site'
+          install_command: "echo Skipping installing the dependencies"
+          build_command: "echo Skipping building the web files"

@@ -1,0 +1,8 @@
+when@prod:
+    sentry:
+        dsn: '%env(SENTRY_DSN)%'
+        options:
+            release: !php/const App\Constants::VERSION
+            traces_sample_rate: 0.2
+        tracing:
+            enabled: true

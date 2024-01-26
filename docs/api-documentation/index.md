@@ -46,15 +46,16 @@ curl '<APP_BASE_URL>/api/v1/stats' \
 
 **HTTP GET Request Parameters:**<br/>
 
-| Object      | Description                                                                                                                                                                                                                             |
-|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `date_from` | Filter results based on a specific timeframe by passing a from-date in `YYYY-MM-DD` format. You can also specify an exact time in ISO-8601 date format, e.g. `2024-01-01T00:00:00.000Z`.                                                |
-| `date_to`   | Filter results based on a specific timeframe by passing an end-date in `YYYY-MM-DD` format. You can also specify an exact time in ISO-8601 date format, e.g. `2024-01-01T00:00:00.000Z`.                                                |
-| `interval`  | Filter results based on an interval in the timeframe selected. Available values: `day` (Default), `week`, `month`, `year`.                                                                                                              |
-| `fields`    | Select information needed and optimize bandwidth with a partial response. Example: If you want to only need the values for `calories` and `proteins`, you should set the value `calories,proteins`. By default, everything is returned. |
-| `sort`      | By default, results are sorted by date/time descending. Use this parameter to specify a sorting order. Available values: `DESC` (Default), `ASC`.                                                                                       |
-| `limit`     | Specify a pagination limit (number of results per page) for your API request. Default limit value is `100`, maximum allowed limit value is `500`.                                                                                       |
-| `offset`    | Specify a pagination offset value for your API request. Example: An offset value of `100` combined with a limit value of 10 would show results 100-110. Default value is `0`, starting with the first available result.                 |
+| Object      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `date_from` | Filter results based on a specific timeframe by passing a from-date in `YYYY-MM-DD` format. You can also specify an exact time in ISO-8601 date format, e.g. `2024-01-01T00:00:00.000Z`.                                                                                                                                                                                                                                                   |
+| `date_to`   | Filter results based on a specific timeframe by passing an end-date in `YYYY-MM-DD` format. You can also specify an exact time in ISO-8601 date format, e.g. `2024-01-01T00:00:00.000Z`.                                                                                                                                                                                                                                                   |
+| `interval`  | Filter results based on an interval in the timeframe selected. Available values: `day` (Default), `week`, `month`, `year`.                                                                                                                                                                                                                                                                                                                 |
+| `fields`    | Select information needed and optimize bandwidth with a partial response. Example: If you want to only need the values for `calories` and `proteins`, you should set the value `calories,proteins`. By default, everything is returned.                                                                                                                                                                                                    |
+| `sort`      | By default, results are sorted by date/time descending. Use this parameter to specify a sorting order. Available values: `DESC` (Default), `ASC`.                                                                                                                                                                                                                                                                                          |
+| `limit`     | Specify a pagination limit (number of results per page) for your API request. Default limit value is `100`, maximum allowed limit value is `500`.                                                                                                                                                                                                                                                                                          |
+| `offset`    | Specify a pagination offset value for your API request. Example: An offset value of `100` combined with a limit value of 10 would show results 100-110. Default value is `0`, starting with the first available result.                                                                                                                                                                                                                    |
+| `filter`    | Filter results based on filtering values. You need to use the template `field[operator]:number` where `field` is a nutrition title, `operator` is either `gt` (Greater than) or `lt` (Less than) and `number` is a numeric value. You can have multiple filter by using a comma between them. Example: `calories[lt]:1350,proteins[gt]:50` will return results where `calories` are less than `1350` and `proteins` are greater than `50`. |
 
 **Example API Response:**<br/>
 ```json
@@ -196,3 +197,29 @@ curl '<APP_BASE_URL>/api/v1/sync' \
 |-----------------|--------------------------------------------------------|
 | `status`        | HTTP status code                                       |
 | `message`       | Return `'Data synchronized.'` if the data was inserted |
+
+### Health Endpoint <label class="http get"></label>
+The `health` endpoint permit to monitor if there isn't any problem with the app.<br/>
+<ins>No authentication required</ins> for this endpoint.
+
+**Example API Request:**<br/>
+```bash
+curl '<APP_BASE_URL>/api/v1/health'
+```
+
+**Example API Response:**<br/>
+```json
+{
+	"healthy": true
+}
+```
+
+**API Response Objects:**<br/>
+
+| Response Object | Description                       |
+|-----------------|-----------------------------------|
+| `healthy`       | Return `true` if everything is ok |
+
+!!! info
+
+    If a non-200 HTTP status code is returned or if the returned healthy field is false the service should be considered as unhealthy.

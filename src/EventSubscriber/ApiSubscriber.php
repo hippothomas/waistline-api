@@ -28,8 +28,13 @@ class ApiSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $path = $request->getPathInfo();
 
+		// List of api paths, that don't require authentication
+		$path_exceptions = [
+			'/api/v1/health'
+		];
+
         // Verify if we are in an API context
-        if (str_starts_with($path, "/api")) {
+        if (str_starts_with($path, "/api") && !in_array($path, $path_exceptions)) {
 			// Check if the incoming HTTP request lacks the 'Authorization' header
 			if (!$request->headers->has('Authorization')) {
 				throw new HttpException(401, 'You have not supplied an API Key.');

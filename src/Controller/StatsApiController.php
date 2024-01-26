@@ -35,6 +35,10 @@ class StatsApiController extends ApiController
 		"month" => "P1M",
 		"year" => "P1Y"
 	];
+	private const array FILTER_POSSIBILITIES = [
+		"lt" => '$lt', // Less than
+		"gt" => '$gt', // Greater than
+	];
 
     public function __construct(
 		private readonly MongoDB $mongoDB,
@@ -94,13 +98,17 @@ class StatsApiController extends ApiController
 			throw new HttpException(400, 'Invalid limit or offset value. Limit must be greater than 0, and offset must be non-negative.');
 		}
 
+		// Handle filtering
+		$filters_parameter = (string) $request->get('filter');
+
 		$cursor = $this->mongoDB->retrieveUserNutritionData(
 			$user->getId(),
 			$date_list,
 			$this->getFields($fields_parameter),
 			$sort,
 			$limit,
-			$offset
+			$offset,
+			$this->getFilters($filters_parameter),
 		);
 		if ($cursor === false) {
 			throw new HttpException(500, 'An error occurred while processing your request. Please try again later.');
@@ -164,5 +172,37 @@ class StatsApiController extends ApiController
 		}
 		// In case of exception or if not found in possibility list return day interval
 		return new DateInterval('P1D');
+	}
+
+	/**
+	 * Get the filters list base on request parameters
+	 * @param string $filters_parameter Filters passed in request parameters
+	 * @return array
+	 */
+	private function getFilters(string $filters_parameter): array
+	{
+		$filters = [];
+
+		// Get filter list
+		foreach (explode(',', $filters_parameter) as $param) {
+			// Check if the filter pattern is respected : field[operator]:number
+			if (!preg_match('/([A-Za-z]+)\\[([A-Za-z0-9]+)]:([0-9]+)/i', $param, $matches)) {
+				continue;
+			}
+			// Check if the field is valid
+			if (!in_array($matches[1], self::FIELD_POSSIBILITIES)) {
+				continue;
+			}
+			// Check if the operator is valid
+			if (!array_key_exists($matches[2], self::FILTER_POSSIBILITIES)) {
+				continue;
+			}
+			// Check if the last parameter is a valid number
+			if (!is_numeric($matches[3])) {
+				continue;
+			}
+			$filters["nutrition.".$matches[1]][self::FILTER_POSSIBILITIES[$matches[2]]] = (int) $matches[3];
+		}
+		return $filters;
 	}
 }

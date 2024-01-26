@@ -5,12 +5,28 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
-  amd-build:
-    name: Build & Deploy (AMD)
+  set-environment:
+    name: Set environment
     runs-on: ubuntu-latest
     steps:
     - name: Get the latest code
       uses: actions/checkout@v4
+
+    - name: Set App Version
+      run: |
+        VERSION=$(php -r "include 'src/Constants.php'; echo App\Constants::VERSION;")
+        echo "APP_VERSION=$VERSION" > $GITHUB_WORKSPACE/.env
+
+  amd-build:
+    name: Build & Deploy (AMD)
+    needs: set-environment
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get the latest code
+      uses: actions/checkout@v4
+
+    - name: Load environment
+      run: source $GITHUB_WORKSPACE/.env
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -29,14 +45,18 @@ jobs:
         platforms: linux/amd64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: waistlineapi/waistline-api:${{ secrets.VERSION }}-amd64
+        tags: waistlineapi/waistline-api:${{ APP_VERSION }}-amd64
 
   arm-build:
     name: Build & Deploy (ARM)
+    needs: set-environment
     runs-on: buildjet-4vcpu-ubuntu-2204-arm
     steps:
     - name: Get the latest code
       uses: actions/checkout@v4
+
+    - name: Load environment
+      run: source $GITHUB_WORKSPACE/.env
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -55,7 +75,7 @@ jobs:
         platforms: linux/arm64
         build-args: VERSION=${{ secrets.PHP_VERSION }}
         push: true
-        tags: waistlineapi/waistline-api:${{ secrets.VERSION }}-arm64
+        tags: waistlineapi/waistline-api:${{ APP_VERSION }}-arm64
 
   combine-manifest:
     name: Combine the manifests
@@ -64,15 +84,19 @@ jobs:
       - arm-build
     runs-on: ubuntu-latest
     steps:
+    - name: Load environment
+      run: source $GITHUB_WORKSPACE/.env
+
     - name: Login to container registry
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ secrets.CONTAINER_REGISTRY_PWD }}
+
     - name: Combine the manifests
       uses: int128/docker-manifest-create-action@v2
       with:
         tags: waistlineapi/waistline-api:latest
         sources: |
-          waistlineapi/waistline-api:${{ secrets.VERSION }}-amd64
-          waistlineapi/waistline-api:${{ secrets.VERSION }}-arm64
+          waistlineapi/waistline-api:${{ APP_VERSION }}-amd64
+          waistlineapi/waistline-api:${{ APP_VERSION }}-arm64

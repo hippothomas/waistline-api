@@ -87,6 +87,7 @@ jobs:
     name: Combine the manifests
     if: github.event_name != 'pull_request'
     needs:
+      - set-environment
       - amd-build
       - arm-build
     runs-on: ubuntu-latest

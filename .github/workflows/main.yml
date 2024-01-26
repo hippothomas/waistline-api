@@ -12,6 +12,14 @@ jobs:
     - name: Get the latest code
       uses: actions/checkout@v4
 
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ secrets.PHP_VERSION }}
+        extensions: none
+        coverage: none
+        tools: none
+
     - name: Set App Version
       run: |
         VERSION=$(php -r "include 'src/Constants.php'; echo App\Constants::VERSION;")

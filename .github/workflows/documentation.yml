@@ -17,7 +17,7 @@ jobs:
 
       - name: MkDocs build
         run: |
-            pip install mkdocs
+            pip install mkdocs mkdocs-material
             mkdocs build
 
       - uses: jsmrcaga/action-netlify-deploy@v2.0.0

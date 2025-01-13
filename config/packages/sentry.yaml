@@ -4,5 +4,7 @@ when@prod:
         options:
             release: !php/const App\Constants::VERSION
             traces_sample_rate: 0.2
+            integrations:
+                - 'Sentry\Integration\IgnoreErrorsIntegration'
         tracing:
             enabled: true

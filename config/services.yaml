@@ -39,3 +39,9 @@ services:
         arguments:
             $mongoDbUrl: '%mongodb.url%'
             $mongoDbName: '%mongodb.name%'
+
+    Sentry\Integration\IgnoreErrorsIntegration:
+        arguments:
+            $options:
+                ignore_exceptions:
+                    - Symfony\Component\HttpKernel\Exception\NotFoundHttpException
